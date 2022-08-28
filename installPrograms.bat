@@ -32,7 +32,7 @@ setlocal DisableDelayedExpansion
 for %%I in ("%pathToFiles%*.exe") do (
     echo INSTALANDO: %%~nI
     timeout 2 >nul
-    start "Running %%~nI" /wait "%%I" /S
+    start "Running %%~nI" /wait "%%I" /S /s /v/qn /quiet /passive /silent /VERYSILENT /exenoui /norestart /log
     echo.
     echo.
 )
@@ -44,7 +44,7 @@ timeout 3 >nul
 for %%I in ("%pathToFiles%*.msi") do (
     echo INSTALANDO: %%~nI
     timeout 2 >nul
-    msiexec /i %%I /quiet /norestart 
+    msiexec /i %%I /quiet /qb! /l*v install.log /norestart 
     echo.
     echo.
 )
