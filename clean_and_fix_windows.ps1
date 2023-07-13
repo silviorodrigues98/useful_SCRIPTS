@@ -1,13 +1,7 @@
-# Create a restore point
+#Create restore point
 Write-Output "Creating a restore point..."
 try {
-    $description = "Restore point created by script"
-    $restorePoint = @{
-        Description      = $description
-        RestorePointType = [Microsoft.PowerShell.Commands.RestorePointTypes]::MODIFY_SETTINGS
-        EventType        = [Microsoft.PowerShell.Commands.RestorePointEventTypes]::BEGIN_SYSTEM_CHANGE
-    }
-    Checkpoint-Computer @restorePoint
+    Checkpoint-Computer -Description "RestorePoint1" -RestorePointType "MODIFY_SETTINGS"
     Write-Output "Restore point created successfully."
 }
 catch {
