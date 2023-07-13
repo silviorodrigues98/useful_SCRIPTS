@@ -38,16 +38,6 @@ catch {
     Write-Output "Error running Disk Cleanup: $_"
 }
 
-# Upgrade all packages managed by winget
-Write-Output "Upgrading all packages managed by winget..."
-try {
-    winget upgrade --all
-    Write-Output "All packages managed by winget upgraded successfully."
-}
-catch {
-    Write-Output "Error upgrading packages managed by winget: $_"
-}
-
 # Check for and install Windows updates
 Write-Output "Checking for and installing Windows updates..."
 try {
