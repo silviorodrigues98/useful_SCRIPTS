@@ -38,18 +38,6 @@ catch {
     Write-Output "Error running Disk Cleanup: $_"
 }
 
-# Check for and install Windows updates
-Write-Output "Checking for and installing Windows updates..."
-try {
-    usoclient StartScan
-    usoclient StartDownload
-    usoclient StartInstall
-    Write-Output "Windows updates installed successfully."
-}
-catch {
-    Write-Output "Error installing Windows updates: $_"
-}
-
 # Clear temporary files
 Write-Output "Clearing temporary files..."
 try {
