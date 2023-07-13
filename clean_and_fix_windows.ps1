@@ -89,7 +89,7 @@ catch {
 # Check for and fix disk errors
 Write-Output "Checking for and fixing disk errors..."
 try {
-    chkdsk C: /f
+    echo y | chkdsk C: /f /r
     Write-Output "Disk errors fixed successfully."
 }
 catch {
