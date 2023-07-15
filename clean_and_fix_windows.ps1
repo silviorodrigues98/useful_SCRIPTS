@@ -5,7 +5,7 @@ try {
     Write-Output "Restore point created successfully."
 }
 catch {
-    Write-Output "Error creating restore point: $_"
+    Write-Output "Error creating restore point: $($_.Exception.Message)"
 }
 
 # Run System File Checker
@@ -15,7 +15,7 @@ try {
     Write-Output "System File Checker completed successfully."
 }
 catch {
-    Write-Output "Error running System File Checker: $_"
+    Write-Output "Error running System File Checker: $($_.Exception.Message)"
 }
 
 # Run Deployment Image Servicing and Management
@@ -25,7 +25,7 @@ try {
     Write-Output "Deployment Image Servicing and Management completed successfully."
 }
 catch {
-    Write-Output "Error running Deployment Image Servicing and Management: $_"
+    Write-Output "Error running Deployment Image Servicing and Management: $($_.Exception.Message)"
 }
 
 # Run Disk Cleanup
@@ -35,17 +35,7 @@ try {
     Write-Output "Disk Cleanup completed successfully."
 }
 catch {
-    Write-Output "Error running Disk Cleanup: $_"
-}
-
-# Clear temporary files
-Write-Output "Clearing temporary files..."
-try {
-    Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Output "Temporary files cleared successfully."
-}
-catch {
-    Write-Output "Error clearing temporary files: $_"
+    Write-Output "Error running Disk Cleanup: $($_.Exception.Message)"
 }
 
 # Run a quick virus scan with Windows Defender
@@ -55,7 +45,7 @@ try {
     Write-Output "Virus scan completed successfully."
 }
 catch {
-    Write-Output "Error running virus scan: $_"
+    Write-Output "Error running virus scan: $($_.Exception.Message)"
 }
 
 # Check for and fix disk errors
@@ -65,7 +55,29 @@ try {
     Write-Output "Disk errors fixed successfully."
 }
 catch {
-    Write-Output "Error fixing disk errors: $_"
+    Write-Output "Error fixing disk errors: $($_.Exception.Message)"
+}
+
+# Clear temporary files
+Write-Output "Clearing temporary files..."
+try {
+    Remove-Item -Path $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path C:\Windows\Temp\* -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path C:\Windows\Prefetch\* -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Output "Temporary files cleared successfully."
+}
+catch {
+    Write-Output "Error clearing temporary files: $($_.Exception.Message)"
+}
+
+try {
+    # Attempt to empty the Recycle Bin
+    Clear-RecycleBin -Force -ErrorAction SilentlyContinue
+    Write-Host "Recycle Bin emptied successfully."
+}
+catch {
+    # Handle any errors that may occur
+    Write-Host "An error occurred while emptying the Recycle Bin: $($_.Exception.Message)"
 }
 
 # Clear DNS cache
@@ -75,7 +87,7 @@ try {
     Write-Output "DNS cache cleared successfully."
 }
 catch {
-    Write-Output "Error clearing DNS cache: $_"
+    Write-Output "Error clearing DNS cache: $($_.Exception.Message)"
 }
 
 # Done
