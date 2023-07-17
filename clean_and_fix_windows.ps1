@@ -7,7 +7,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error creating restore point: $($_.Exception.Message)"
+    Write-Output "Error creating restore point: $_"
 }
 
 # Run System File Checker
@@ -19,7 +19,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error running System File Checker: $($_.Exception.Message)"
+    Write-Output "Error running System File Checker: $_"
 }
 
 # Run Deployment Image Servicing and Management
@@ -31,7 +31,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error running Deployment Image Servicing and Management: $($_.Exception.Message)"
+    Write-Output "Error running Deployment Image Servicing and Management: $_"
 }
 
 # Run Disk Cleanup
@@ -43,7 +43,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error running Disk Cleanup: $($_.Exception.Message)"
+    Write-Output "Error running Disk Cleanup: $_"
 }
 
 # Run a quick virus scan with Windows Defender
@@ -55,7 +55,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error running virus scan: $($_.Exception.Message)"
+    Write-Output "Error running virus scan: $_"
 }
 
 # Check for and fix disk errors
@@ -67,7 +67,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error fixing disk errors: $($_.Exception.Message)"
+    Write-Output "Error fixing disk errors: $_"
 }
 
 # Clear temporary files
@@ -83,7 +83,7 @@ try {
 }
 catch {
     # Handle any errors that may occur
-    Write-Output "Error clearing temporary files: $($_.Exception.Message)"
+    Write-Output "Error clearing temporary files: $_"
 }
 
 try {
@@ -93,30 +93,30 @@ try {
 }
 catch {
     # Handle any errors that may occur while emptying the Recycle Bin
-    Write-Host "An error occurred while emptying the Recycle Bin: $($_.Exception.Message)"
+    Write-Host "An error occurred while emptying the Recycle Bin: $_"
 }
 
 try {
    
-   # Attempt to clear Microsoft Store cache using WSReset.exe command 
-   WSReset.exe 
-   Write-Host "Microsoft Store cache cleared"
+    # Attempt to clear Microsoft Store cache using WSReset.exe command 
+    WSReset.exe 
+    Write-Host "Microsoft Store cache cleared"
 }
 catch {
-   # Handle any errors that may occur while clearing Microsoft Store cache 
-   Write-Host "An error occurred while clearing Microsoft Store cache $($_.Exception.Message)"
+    # Handle any errors that may occur while clearing Microsoft Store cache 
+    Write-Host "An error occurred while clearing Microsoft Store cache $_"
 }
 
 # Clear DNS cache 
 Write-Output "Clearing DNS cache..."
 try { 
-   # Use ipconfig command to flush DNS resolver cache 
-   ipconfig /flushdns 
-   Write-Output "DNS cache cleared successfully." 
+    # Use ipconfig command to flush DNS resolver cache 
+    ipconfig /flushdns 
+    Write-Output "DNS cache cleared successfully." 
 } 
 catch { 
-   # Handle any errors that may occur while clearing DNS cache 
-   Write-Output "Error clearing DNS cache: $($_.Exception.Message)" 
+    # Handle any errors that may occur while clearing DNS cache 
+    Write-Output "Error clearing DNS cache: $_" 
 } 
 
 # Done 
