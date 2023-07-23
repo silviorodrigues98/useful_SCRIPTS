@@ -14,3 +14,6 @@ try {
 catch {
     Write-Output "An error occurred: $_"
 }
+finally {
+    Start-Sleep -Seconds 5
+}

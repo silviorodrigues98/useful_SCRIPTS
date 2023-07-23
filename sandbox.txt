@@ -1,0 +1,13 @@
+@echo off
+setlocal enableextensions enabledelayedexpansion
+set /p UserInput=Enter a number: 
+set /a Test=UserInput
+if !Test! EQU 0 (
+  if !UserInput! EQU 0 (
+    echo Number
+  ) else (
+    echo Not a number
+  )
+) else (
+  echo Number
+)

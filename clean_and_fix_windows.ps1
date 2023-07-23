@@ -46,18 +46,6 @@ catch {
     Write-Output "Error running Disk Cleanup: $_"
 }
 
-# Run a quick virus scan with Windows Defender
-Write-Output "Running a quick virus scan with Windows Defender..."
-try {
-    # Use the Start-MpScan cmdlet to start a quick virus scan with Windows Defender
-    Start-MpScan -ScanType QuickScan
-    Write-Output "Virus scan completed successfully."
-}
-catch {
-    # Handle any errors that may occur
-    Write-Output "Error running virus scan: $_"
-}
-
 # Check for and fix disk errors
 Write-Output "Checking for and fixing disk errors..."
 try {
@@ -85,39 +73,6 @@ catch {
     # Handle any errors that may occur
     Write-Output "Error clearing temporary files: $_"
 }
-
-try {
-    # Attempt to empty the Recycle Bin using the Clear-RecycleBin cmdlet
-    Clear-RecycleBin -Force -ErrorAction SilentlyContinue
-    Write-Host "Recycle Bin emptied successfully."
-}
-catch {
-    # Handle any errors that may occur while emptying the Recycle Bin
-    Write-Host "An error occurred while emptying the Recycle Bin: $_"
-}
-
-try {
-   
-    # Attempt to clear Microsoft Store cache using WSReset.exe command 
-    WSReset.exe 
-    Write-Host "Microsoft Store cache cleared"
-}
-catch {
-    # Handle any errors that may occur while clearing Microsoft Store cache 
-    Write-Host "An error occurred while clearing Microsoft Store cache $_"
-}
-
-# Clear DNS cache 
-Write-Output "Clearing DNS cache..."
-try { 
-    # Use ipconfig command to flush DNS resolver cache 
-    ipconfig /flushdns 
-    Write-Output "DNS cache cleared successfully." 
-} 
-catch { 
-    # Handle any errors that may occur while clearing DNS cache 
-    Write-Output "Error clearing DNS cache: $_" 
-} 
 
 # Done 
 Write-Output "Done!" 
