@@ -20,10 +20,12 @@ del /f /s /q C:\Windows\Temp\*
 del /f /s /q C:\Windows\Prefetch\*
 del /f /s /q C:\Windows\SoftwareDistribution\Download\*
 
-for /f "skip=1 tokens=3" %%a in ('powershell "get-physicaldisk | format-table -autosize"') do (
+for /f "skip=1 tokens=3" %%a in ('powershell "get-physicaldisk | format-table -autosize MediaType"') do (
     if "%%a"=="HDD" (
         echo Defragmenting C drive...
         defrag C: /U /V
+    )else (
+    echo Hard drive not detected, skipping Defrag
     )
 )
 
