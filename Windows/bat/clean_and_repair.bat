@@ -29,8 +29,5 @@ for /f "skip=1 tokens=3" %%a in ('powershell "get-physicaldisk | format-table -a
     )
 )
 
-echo Starting Windows MRT to remove malware
-mrt.exe /f:Y /q:Y
-
 echo Done!
 pause
