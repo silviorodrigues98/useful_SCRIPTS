@@ -1,33 +1,50 @@
 @echo off
-echo Creating a restore point...
-wmic.exe /Namespace:\\root\default Path SystemRestore Call CreateRestorePoint "clean_repair", 100, 12
+set log=%~dp0\maintenance.log
 
-echo Running System File Checker...
-sfc /scannow
+echo Starting maintenance tasks... >> %log%
+wmic.exe /namespace:\\root\default Path SystemRestore Call enable "C:\" >> %log%
+if %errorlevel% == 0 (
+    echo System Restore has been enabled on the C: drive. >> %log%
+) else (
+    echo An error occurred while enabling System Restore on the C: drive. >> %log%
+)
 
-echo Running Deployment Image Servicing and Management...
-dism.exe /online /cleanup-image /restorehealth
+echo Creating a restore point... >> %log%
+wmic.exe /Namespace:\\root\default Path SystemRestore Call CreateRestorePoint "clean_repair", 100, 12 >> %log%
 
-echo Running Disk Cleanup...
-cleanmgr.exe /sagerun:1
+echo Running System File Checker... >> %log%
+sfc /scannow >> %log%
 
-echo Checking for and fixing disk errors...
-echo y | chkdsk C: /f /r
+echo Running Deployment Image Servicing and Management... >> %log%
+dism.exe /online /cleanup-image /restorehealth >> %log%
 
-echo Clearing temporary files...
-del /f /s /q %TEMP%\*
-del /f /s /q C:\Windows\Temp\*
-del /f /s /q C:\Windows\Prefetch\*
-del /f /s /q C:\Windows\SoftwareDistribution\Download\*
+echo Running Disk Cleanup... >> %log%
+cleanmgr.exe /sagerun:1 >> %log%
+
+echo Checking for and fixing disk errors... >> %log%
+echo y | chkdsk C: /f /r >> %log%
+
+echo Clearing temporary files... >> %log%
+del /f /s /q %TEMP%\* >> %log%
+del /f /s /q C:\Windows\Temp\* >> %log%
+del /f /s /q C:\Windows\Prefetch\* >> %log%
+del /f /s /q C:\Windows\SoftwareDistribution\Download\* >> %log%
+
+echo Clearing Microsoft Store cache... >> %log%
+WSReset.exe >> %log%
 
 for /f "skip=1 tokens=3" %%a in ('powershell "get-physicaldisk | format-table -autosize MediaType"') do (
     if "%%a"=="HDD" (
-        echo Defragmenting C drive...
-        defrag C: /U /V
+        echo Defragmenting C drive... >> %log%
+        defrag C: /U /V >> %log%
     )else (
-    echo Hard drive not detected, skipping Defrag
+    echo Hard drive not detected, skipping Defrag >> %log%
     )
 )
 
-echo Done!
+REM Set Power Management to Best Performance
+echo Setting Power Management to Best Performance... >> %log%
+powercfg /setactive scheme_min >> %log%
+
+echo Done! >> %log%
 pause
