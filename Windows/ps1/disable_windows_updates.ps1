@@ -1,6 +1,12 @@
 # Specify the location to save the backup
 $backupPath = "C:\\RegistryBackup.reg"
 
+# Specify the location of the log file
+$logPath = "C:\\ScriptLog.txt"
+
+# Redirect all output to the log file
+Start-Transcript -Path $logPath -Append
+
 # Export the entire registry
 Write-Host "Creating a backup of your registry..."
 reg export HKLM $backupPath
@@ -50,3 +56,6 @@ if ($?) {
 } else {
     Write-Host "Failed to disable automatic updates."
 }
+
+# Stop redirecting output to the log file
+Stop-Transcript
