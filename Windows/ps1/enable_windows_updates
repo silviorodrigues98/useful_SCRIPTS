@@ -1,6 +1,12 @@
 # Specify the location of the backup
 $backupPath = "C:\\RegistryBackup.reg"
 
+# Specify the location of the log file
+$logPath = "C:\\ScriptLog.txt"
+
+# Redirect all output to the log file
+Start-Transcript -Path $logPath -Append
+
 # Import the registry backup
 Write-Host "Restoring your registry from the backup..."
 reg import $backupPath
@@ -50,3 +56,6 @@ if ($?) {
 } else {
     Write-Host "Failed to enable automatic updates."
 }
+
+# Stop redirecting output to the log file
+Stop-Transcript
