@@ -1,27 +1,27 @@
-# Specify the location to save the backup
+# Specify the location of the backup
 $backupPath = "C:\\RegistryBackup.reg"
 
-# Export the entire registry
-Write-Host "Creating a backup of your registry..."
-reg export HKLM $backupPath
+# Import the registry backup
+Write-Host "Restoring your registry from the backup..."
+reg import $backupPath
 if ($?) {
-    Write-Host "Registry backup has been created successfully at $backupPath"
+    Write-Host "Registry has been restored successfully from $backupPath"
 } else {
-    Write-Host "Failed to create a registry backup."
+    Write-Host "Failed to restore the registry."
     exit
 }
 
-# Stop the Windows Update service
-Stop-Service -Name wuauserv
+# Start the Windows Update service
+Start-Service -Name wuauserv
 
-# Set the startup type of the Windows Update service to disabled
-Set-Service -Name wuauserv -StartupType Disabled
+# Set the startup type of the Windows Update service to automatic
+Set-Service -Name wuauserv -StartupType Automatic
 
-# Disable automatic updates via Local Group Policy Editor
-Write-Host "Disabling automatic updates via Local Group Policy Editor..."
+# Enable automatic updates via Local Group Policy Editor
+Write-Host "Enabling automatic updates via Local Group Policy Editor..."
 $registryPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Group Policy Objects\{48981759-12F2-42A6-A048-028B3973495F}Machine\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"
 $propertyName = "NoAutoUpdate"
-$propertyValue = 1
+$propertyValue = 0
 
 # Create the registry path if it does not exist
 if (!(Test-Path $registryPath)) {
@@ -31,11 +31,11 @@ if (!(Test-Path $registryPath)) {
 # Set the property value
 Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue
 
-# Disable automatic updates via Registry
-Write-Host "Disabling automatic updates via Registry..."
+# Enable automatic updates via Registry
+Write-Host "Enabling automatic updates via Registry..."
 $registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
 $propertyName = "AUOptions"
-$propertyValue = 1
+$propertyValue = 4
 
 # Create the registry path if it does not exist
 if (!(Test-Path $registryPath)) {
@@ -44,3 +44,9 @@ if (!(Test-Path $registryPath)) {
 
 # Set the property value
 Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue
+
+if ($?) {
+    Write-Host "Automatic updates have been enabled successfully."
+} else {
+    Write-Host "Failed to enable automatic updates."
+}
