@@ -1,4 +1,6 @@
-# Create a restore point
+$principal = New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())
+if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+  # Create a restore point
 Write-Output "Creating a restore point..."
 try {
     # Use the Checkpoint-Computer cmdlet to create a new system restore point
@@ -76,3 +78,7 @@ catch {
 
 # Done 
 Write-Output "Done!" 
+
+} else {
+  Start-Process -FilePath "powershell" -ArgumentList "$('-File \"\"')$(Get-Location)$('\\')$($MyInvocation.MyCommand.Name)$('\"\"')" -Verb runAs
+}
