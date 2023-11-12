@@ -59,3 +59,6 @@ if ($?) {
 
 # Stop redirecting output to the log file
 Stop-Transcript
+
+# Pausa a execução no final
+Read-Host -Prompt "Pressione Enter para sair"
