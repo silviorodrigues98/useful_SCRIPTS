@@ -59,3 +59,7 @@ Scripts for Linux (Shell scripts):
 ## ⚠️ Disclaimer
 
 These scripts are provided "as is". specific scripts (especially those modifying system files or registry) should be reviewed before running. Always create a system restore point before running maintenance scripts.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
