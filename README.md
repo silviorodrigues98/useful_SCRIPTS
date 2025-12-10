@@ -1,33 +1,61 @@
+# Useful Scripts Collection
 
-# Useful scripts
+A comprehensive collection of Windows and Linux scripts for identifying product keys, system maintenance, network troubleshooting, and software installation.
 
-## Description:
+## 📂 Project Structure
 
-This project is a culmination of years of experience in tech, computer use, and IT support. It provides a collection of handy scripts that automate various tasks, including:
+### 🪟 Windows
 
--   Fixing common errors
--   Installing programs
--   Performing other miscellaneous functions
-- Windows and Linux 
+Scripts related to Windows OS, organized by function:
 
-## Features
+- **Activation**: Tools to retrieve or manage Windows and Office product keys.
+  - `discover_windows_product_key.ps1`
+  - `discover_office_key.bat`
+- **Maintenance**: Utilities for cleaning, repairing, and managing system updates.
+  - `clean_and_repair.bat`: Comprehensive system cleanup and repair.
+  - `disable_windows_updates.bat/ps1`: Scripts to toggle Windows Updates.
+- **Network**: Scripts for network configuration and password recovery.
+  - `see_wifi_passwords.ps1`: Recover saved WiFi passwords.
+  - `reset_network_config.bat`: Reset network stack settings.
+- **Installation**: Quick installers for common software and drivers.
+  - `install_programs.bat`: Batch installer for standard apps.
+  - `manage-printers.ps1`: Printer management utility.
+- **DevTools**: Helper scripts for developers.
+  - `new_esp_project.bat`: Setup for ESP projects.
+  - `purge_docker_files.ps1`: Clean up Docker resources.
+- **PowerManagement**: Shutdown timers and power profile settings.
 
--   **Streamlined workflows:**  Automate repetitive tasks to save you time and effort.
--   **Improved efficiency:**  Get things done quicker with pre-written scripts.
--   **Reduced errors:**  Mitigate the risk of mistakes by using consistent scripts.
+### 🐧 Linux
 
-## How to use
+Scripts for Linux (Shell scripts):
 
-**Clone this repository**
+- **Installation**: Automated installers for tools like Docker, Git, Google Drive, etc.
+  - `InstallDockerCLI.sh`
+  - `installTerminator.sh`
+- **System**: internal system configuration and fixes.
+  - `setupUFW.sh`: Configure Uncomplicated Firewall.
+  - `CleanLinux.sh`: System cleanup script.
 
-    git clone https://github.com/silviorodrigues98/useful_SCRIPTS
+## 🚀 Usage
 
-**Choose your sistem, Windows or Linux, and enjoy!** 
+### Windows
+- **Batch Files (.bat)**: Double-click or run from Command Prompt. Most require **Run as Administrator**.
+- **PowerShell (.ps1)**: Right-click and select "Run with PowerShell", or run from a PowerShell terminal. You may need to set execution policy:
+  ```powershell
+  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+  ```
 
-Some scripts, like bat, can be ran just by clicking twice in the file. Others, like power shell scripts, need to be ran via terminal, using the command:
+### Linux
+- **Shell Scripts (.sh)**:
+  Make the script executable:
+  ```bash
+  chmod +x ScriptName.sh
+  ```
+  Run it:
+  ```bash
+  ./ScriptName.sh
+  ```
 
-    powershell.exe -ExecutionPolicy Bypass -File ./your_file_name.ps1
+## ⚠️ Disclaimer
 
-## Contributing:
-
-If you have any suggestions, feel free to fork this project and generate a pull request.
+These scripts are provided "as is". specific scripts (especially those modifying system files or registry) should be reviewed before running. Always create a system restore point before running maintenance scripts.
