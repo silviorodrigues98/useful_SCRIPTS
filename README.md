@@ -19,7 +19,7 @@ Scripts related to Windows OS, organized by function:
   - `reset_network_config.bat`: Reset network stack settings.
 - **Installation**: Quick installers for common software and drivers.
   - `install_programs.bat`: Batch installer for standard apps.
-  - `manage-printers.ps1`: Printer management utility.
+  - `manage_printers.ps1`: Printer management utility.
 - **DevTools**: Helper scripts for developers.
   - `new_esp_project.bat`: Setup for ESP projects.
   - `purge_docker_files.ps1`: Clean up Docker resources.
@@ -30,11 +30,11 @@ Scripts related to Windows OS, organized by function:
 Scripts for Linux (Shell scripts):
 
 - **Installation**: Automated installers for tools like Docker, Git, Google Drive, etc.
-  - `InstallDockerCLI.sh`
-  - `installTerminator.sh`
+  - `install_docker_cli.sh`
+  - `install_terminator.sh`
 - **System**: internal system configuration and fixes.
-  - `setupUFW.sh`: Configure Uncomplicated Firewall.
-  - `CleanLinux.sh`: System cleanup script.
+  - `setup_ufw.sh`: Configure Uncomplicated Firewall.
+  - `clean_linux.sh`: System cleanup script.
 
 ## 🚀 Usage
 
