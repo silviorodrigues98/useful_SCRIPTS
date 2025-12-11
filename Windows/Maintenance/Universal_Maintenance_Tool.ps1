@@ -199,7 +199,7 @@ Write-Host "============================================================" -Foreg
 Write-Host ""
 Write-Host "Choose your language / Escolha seu idioma:" 
 Write-Host "1. English"
-Write-Host "2. Português"
+Write-Host "2. Portugues"
 Write-Host ""
 $langChoice = Read-Host "Select/Selecione (1/2)"
 
