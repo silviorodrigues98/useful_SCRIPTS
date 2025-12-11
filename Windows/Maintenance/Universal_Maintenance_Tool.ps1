@@ -35,20 +35,195 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 }
 
 # ---------------------------------------------------------------------------
-# Helper Functions
+# Localization Dictionary
+# ---------------------------------------------------------------------------
+$Dict = @{
+    EN = @{
+        HeaderTitle      = "           WINDOWS UNIVERSAL MAINTENANCE TOOL               "
+        PauseMsg         = "Press any key to return to the menu..."
+        
+        EnableRestore    = "Enabling System Restore on C: drive..."
+        ResPointSuccess  = "Success: Restore point created."
+        ResPointFail     = "Error: Could not create restore point."
+        
+        SFCStart         = "Running System File Checker (SFC)..."
+        SFCNote          = "This may take some time."
+        
+        DISMStart        = "Running DISM Image Cleanup and Health Restore..."
+        DISMNote         = "This checks for component store corruption and attempts to repair it."
+        
+        DiskCleanStart   = "Running Disk Cleanup Tool..."
+        DiskCleanMsg     = "Opening standard Disk Cleanup dialog..."
+        DiskCleanDone    = "Disk Cleanup finished."
+        
+        ChkdskAsk        = "Schedule CHKDSK on next restart? (Y/N)"
+        ChkdskScheduled  = "CHKDSK scheduled."
+        ChkdskCancelled  = "Operation cancelled."
+        
+        ClearTempStart   = "Clearing Temporary Files..."
+        ClearTempDone    = "Temporary files cleanup complete."
+        Cleaning         = "Cleaning:"
+        
+        StoreReset       = "Resetting Microsoft Store Cache (WSReset)..."
+        StoreDone        = "Store reset complete."
+        
+        OptStart         = "Optimizing Drives..."
+        OptDrive         = "Optimizing Drive"
+        
+        NetReset         = "Resetting Network Stack..."
+        NetFlush         = "Flushing DNS..."
+        NetRelease       = "Releasing IP..."
+        NetRenew         = "Renewing IP..."
+        NetWinsock       = "Resetting Winsock catalog..."
+        NetIP            = "Resetting IP TCP stack..."
+        NetDone          = "Network reset complete."
+        
+        UpdateReset      = "Resetting Windows Update Components..."
+        Stopping         = "Stopping"
+        Starting         = "Starting"
+        Renaming         = "Renaming SoftwareDistribution and Catroot2 folders..."
+        UpdateDone       = "Windows Update reset complete."
+        
+        PowerHigh        = "Setting Power Plan to High Performance..."
+        PowerDone        = "High Performance plan activated."
+        PowerFail        = "Could not set by ID. Please disable manually."
+        
+        EventLogStart    = "Clearing Windows Event Logs..."
+        EventLogDone     = "Done."
+        
+        RoutineStart     = "Starting Common Maintenance Routine..."
+        RoutineDone      = "Routine complete."
+        
+        SelectOption     = "Select an option"
+        InvalidSel       = "Invalid selection. Please try again."
+        
+        Menu_1           = "1.  Create Restore Point"
+        Menu_2           = "2.  Run System File Checker (SFC)"
+        Menu_3           = "3.  Run DISM Image Repair"
+        Menu_4           = "4.  Clear Temporary Files"
+        Menu_5           = "5.  Disk Cleanup"
+        Menu_6           = "6.  Check Disk (Schedule on Restart)"
+        Menu_7           = "7.  Reset Windows Store"
+        Menu_8           = "8.  Optimize/Defrag Drives"
+        Menu_9           = "9.  Network Reset (Flush DNS/IP)"
+        Menu_10          = "10. Reset Windows Update Components"
+        Menu_11          = "11. Set High Performance Power Plan"
+        Menu_12          = "12. Clear Event Logs"
+        Menu_A           = "A.  Run All Common Tasks (SFC, DISM, Temp)"
+        Menu_Q           = "Q.  Quit"
+    }
+    
+    PT = @{
+        HeaderTitle      = "      FERRAMENTA UNIVERSAL DE MANUTENÇÃO WINDOWS            "
+        PauseMsg         = "Pressione qualquer tecla para voltar ao menu..."
+        
+        EnableRestore    = "Habilitando Restauração do Sistema no drive C:..."
+        ResPointSuccess  = "Sucesso: Ponto de restauração criado."
+        ResPointFail     = "Erro: Não foi possível criar o ponto de restauração."
+        
+        SFCStart         = "Executando Verificador de Arquivos do Sistema (SFC)..."
+        SFCNote          = "Isso pode levar algum tempo."
+        
+        DISMStart        = "Executando DISM (Reparo de Imagem)..."
+        DISMNote         = "Isso verifica a corrupção do armazenamento de componentes e tenta repará-lo."
+        
+        DiskCleanStart   = "Executando Limpeza de Disco..."
+        DiskCleanMsg     = "Abrindo diálogo padrão de Limpeza de Disco..."
+        DiskCleanDone    = "Limpeza de Disco concluída."
+        
+        ChkdskAsk        = "Agendar CHKDSK para a próxima reinicialização? (S/N)"
+        ChkdskScheduled  = "CHKDSK agendado."
+        ChkdskCancelled  = "Operação cancelada."
+        
+        ClearTempStart   = "Limpando Arquivos Temporários..."
+        ClearTempDone    = "Limpeza de arquivos temporários concluída."
+        Cleaning         = "Limpando:"
+        
+        StoreReset       = "Redefinindo Cache da Microsoft Store (WSReset)..."
+        StoreDone        = "Redefinição da Store concluída."
+        
+        OptStart         = "Otimizando Unidades..."
+        OptDrive         = "Otimizando Drive"
+        
+        NetReset         = "Redefinindo Pilha de Rede..."
+        NetFlush         = "Limpando cache DNS..."
+        NetRelease       = "Liberando IP..."
+        NetRenew         = "Renovando IP..."
+        NetWinsock       = "Redefinindo catálogo Winsock..."
+        NetIP            = "Redefinindo pilha TCP IP..."
+        NetDone          = "Redefinição de rede concluída."
+        
+        UpdateReset      = "Redefinindo Componentes do Windows Update..."
+        Stopping         = "Parando"
+        Starting         = "Iniciando"
+        Renaming         = "Renomeando pastas SoftwareDistribution e Catroot2..."
+        UpdateDone       = "Redefinição do Windows Update concluída."
+        
+        PowerHigh        = "Definindo Plano de Energia para Alto Desempenho..."
+        PowerDone        = "Plano de Alto Desempenho ativado."
+        PowerFail        = "Não foi possível definir pelo ID."
+        
+        EventLogStart    = "Limpando Logs de Eventos do Windows..."
+        EventLogDone     = "Feito."
+        
+        RoutineStart     = "Iniciando Rotina de Manutenção Comum..."
+        RoutineDone      = "Rotina completa."
+        
+        SelectOption     = "Selecione uma opção"
+        InvalidSel       = "Seleção inválida. Tente novamente."
+        
+        Menu_1           = "1.  Criar Ponto de Restauração"
+        Menu_2           = "2.  Executar SFC (Verificador de Arquivos)"
+        Menu_3           = "3.  Executar DISM (Reparo de Imagem)"
+        Menu_4           = "4.  Limpar Arquivos Temporários"
+        Menu_5           = "5.  Limpeza de Disco"
+        Menu_6           = "6.  Verificar Disco (Agendar no Reinício)"
+        Menu_7           = "7.  Redefinir Windows Store"
+        Menu_8           = "8.  Otimizar/Desfragmentar Drives"
+        Menu_9           = "9.  Redefinir Rede (Flush DNS/IP)"
+        Menu_10          = "10. Redefinir Windows Update"
+        Menu_11          = "11. Definir Alto Desempenho"
+        Menu_12          = "12. Limpar Logs de Eventos"
+        Menu_A           = "A.  Executar Tarefas Comuns (SFC, DISM, Temp)"
+        Menu_Q           = "Q.  Sair"
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Language Selection
+# ---------------------------------------------------------------------------
+Clear-Host
+Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host "           WINDOWS UNIVERSAL MAINTENANCE TOOL               " -ForegroundColor White
+Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Choose your language / Escolha seu idioma:" 
+Write-Host "1. English"
+Write-Host "2. Português"
+Write-Host ""
+$langChoice = Read-Host "Select/Selecione (1/2)"
+
+if ($langChoice -eq '2') {
+    $L = $Dict.PT
+} else {
+    $L = $Dict.EN
+}
+
+# ---------------------------------------------------------------------------
+# Helper Functions using Localization
 # ---------------------------------------------------------------------------
 
 function Show-Header {
     Clear-Host
     Write-Host "============================================================" -ForegroundColor Cyan
-    Write-Host "           WINDOWS UNIVERSAL MAINTENANCE TOOL               " -ForegroundColor White
+    Write-Host $L.HeaderTitle -ForegroundColor White
     Write-Host "============================================================" -ForegroundColor Cyan
     Write-Host ""
 }
 
 function Pause-Script {
     Write-Host ""
-    Write-Host "Press any key to return to the menu..." -ForegroundColor Gray
+    Write-Host $L.PauseMsg -ForegroundColor Gray
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
@@ -58,12 +233,11 @@ function Pause-Script {
 
 function Enable-SystemRestore {
     Show-Header
-    Write-Host "Enabling System Restore on C: drive..." -ForegroundColor Yellow
+    Write-Host $L.EnableRestore -ForegroundColor Yellow
     try {
         Enable-ComputerRestore -Drive "C:\"
-        Write-Host "Success: System Restore enabled." -ForegroundColor Green
-    }
-    catch {
+        Write-Host "OK" -ForegroundColor Green
+    } catch {
         Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
     }
     Pause-Script
@@ -71,16 +245,17 @@ function Enable-SystemRestore {
 
 function Create-RestorePoint {
     Show-Header
-    Write-Host "Creating a System Restore Point..." -ForegroundColor Yellow
-    $desc = Read-Host "Enter a name for the restore point (default: Maintenance_Checkpoint)"
-    if ([string]::IsNullOrWhiteSpace($desc)) { $desc = "Maintenance_Checkpoint" }
+    Write-Host $L.EnableRestore -ForegroundColor Yellow # Re-using string for context
+    
+    # Auto-naming for simplicity or prompt if needed. Let's automate for smoother UX.
+    $desc = "Maintenance_$(Get-Date -Format 'yyyyMMdd_HHmm')"
     
     try {
         Checkpoint-Computer -Description $desc -RestorePointType "MODIFY_SETTINGS"
-        Write-Host "Success: Restore point '$desc' created." -ForegroundColor Green
+        Write-Host "$($L.ResPointSuccess) ($desc)" -ForegroundColor Green
     }
     catch {
-        Write-Host "Error: Could not create restore point. Ensure System Restore is enabled." -ForegroundColor Red
+        Write-Host $L.ResPointFail -ForegroundColor Red
         Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
     }
     Pause-Script
@@ -88,57 +263,46 @@ function Create-RestorePoint {
 
 function Run-SFC {
     Show-Header
-    Write-Host "Running System File Checker (SFC)..." -ForegroundColor Yellow
-    Write-Host "This may take some time." -ForegroundColor Gray
+    Write-Host $L.SFCStart -ForegroundColor Yellow
+    Write-Host $L.SFCNote -ForegroundColor Gray
     sfc /scannow
     Pause-Script
 }
 
 function Run-DISM {
     Show-Header
-    Write-Host "Running DISM Image Cleanup and Health Restore..." -ForegroundColor Yellow
-    Write-Host "This checks for component store corruption and attempts to repair it." -ForegroundColor Gray
+    Write-Host $L.DISMStart -ForegroundColor Yellow
+    Write-Host $L.DISMNote -ForegroundColor Gray
     DISM.exe /Online /Cleanup-image /Restorehealth
     Pause-Script
 }
 
 function Run-DiskCleanup {
     Show-Header
-    Write-Host "Running Disk Cleanup Tool..." -ForegroundColor Yellow
-    Write-Host "Opening standard Disk Cleanup dialog..." -ForegroundColor Gray
-    # Using /lowdisk to launch the UI directly or /run for sagerun if preferred, 
-    # but /sagerun needs previous /sageset configuration.
-    # To be safe and interactive, we'll launch the cleanmgr selection.
-    
-    # Attempting to use a comprehensive set (needs registry preset usually, creating temp one)
+    Write-Host $L.DiskCleanStart -ForegroundColor Yellow
+    Write-Host $L.DiskCleanMsg -ForegroundColor Gray
     Start-Process cleanmgr.exe -Wait
-    
-    # Or purely automated (requires 'sageset' setup previously):
-    # cleanmgr.exe /sagerun:1 
-    
-    Write-Host "Disk Cleanup finished." -ForegroundColor Green
+    Write-Host $L.DiskCleanDone -ForegroundColor Green
     Pause-Script
 }
 
 function Run-Chkdsk {
     Show-Header
-    Write-Host "Scheduling Disk Check (CHKDSK) for C: drive..." -ForegroundColor Yellow
-    Write-Host "You will need to restart your computer for this to run." -ForegroundColor Gray
+    Write-Host $L.ChkdskAsk -ForegroundColor Yellow
     
-    $choice = Read-Host "Schedule CHKDSK on next restart? (Y/N)"
-    if ($choice -eq 'y' -or $choice -eq 'Y') {
-        # Piping 'y' to chkdsk to accept the schedule prompt
+    $choice = Read-Host "?"
+    if ($choice -match '^[yYsS]') { # Matches Y or S (Sim)
         echo y | chkdsk C: /f /r
-        Write-Host "CHKDSK scheduled." -ForegroundColor Green
+        Write-Host $L.ChkdskScheduled -ForegroundColor Green
     } else {
-        Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Write-Host $L.ChkdskCancelled -ForegroundColor Yellow
     }
     Pause-Script
 }
 
 function Clear-TempFiles {
     Show-Header
-    Write-Host "Clearing Temporary Files..." -ForegroundColor Yellow
+    Write-Host $L.ClearTempStart -ForegroundColor Yellow
     
     $paths = @(
         "$env:TEMP\*",
@@ -147,40 +311,37 @@ function Clear-TempFiles {
     )
 
     foreach ($path in $paths) {
-        Write-Host "Cleaning: $path" -ForegroundColor Gray
+        Write-Host "$($L.Cleaning) $path" -ForegroundColor Gray
         try {
             Remove-Item -Path $path -Recurse -Force -ErrorAction SilentlyContinue
-        } catch {
-            Write-Host "Skipped some locked files in $path" -ForegroundColor DarkGray
-        }
+        } catch { }
     }
     
-    Write-Host "Temporary files cleanup complete." -ForegroundColor Green
+    Write-Host $L.ClearTempDone -ForegroundColor Green
     Pause-Script
 }
 
 function Reset-WindowsStore {
     Show-Header
-    Write-Host "Resetting Microsoft Store Cache (WSReset)..." -ForegroundColor Yellow
-    Write-Host "This will open the Store app when finished." -ForegroundColor Gray
+    Write-Host $L.StoreReset -ForegroundColor Yellow
     Start-Process "wsreset.exe" -Wait
-    Write-Host "Store reset complete." -ForegroundColor Green
+    Write-Host $L.StoreDone -ForegroundColor Green
     Pause-Script
 }
 
 function Optimize-Drives {
     Show-Header
-    Write-Host "Optimizing Drives..." -ForegroundColor Yellow
+    Write-Host $L.OptStart -ForegroundColor Yellow
     
     $drives = Get-Volume | Where-Object { $_.DriveType -eq 'Fixed' }
     foreach ($vol in $drives) {
         $driveLetter = $vol.DriveLetter
         if ($driveLetter) {
-            Write-Host "Optimizing Drive $driveLetter..." -ForegroundColor Cyan
+            Write-Host "$($L.OptDrive) $driveLetter..." -ForegroundColor Cyan
             try {
                 Optimize-Volume -DriveLetter $driveLetter -ReTrim -Defrag -Verbose
             } catch {
-                Write-Host "Error optimizing $driveLetter : $($_.Exception.Message)" -ForegroundColor Red
+                Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
             }
         }
     }
@@ -189,39 +350,30 @@ function Optimize-Drives {
 
 function Reset-Network {
     Show-Header
-    Write-Host "Resetting Network Stack..." -ForegroundColor Yellow
+    Write-Host $L.NetReset -ForegroundColor Yellow
     
-    Write-Host "Flushing DNS..."
-    ipconfig /flushdns
+    Write-Host $L.NetFlush; ipconfig /flushdns
+    Write-Host $L.NetRelease; ipconfig /release
+    Write-Host $L.NetRenew; ipconfig /renew
+    Write-Host $L.NetWinsock; netsh winsock reset
+    Write-Host $L.NetIP; netsh int ip reset
     
-    Write-Host "Releasing IP..."
-    ipconfig /release
-    
-    Write-Host "Renewing IP..."
-    ipconfig /renew
-    
-    Write-Host "Resetting Winsock catalog..."
-    netsh winsock reset
-    
-    Write-Host "Resetting IP TCP stack..."
-    netsh int ip reset
-    
-    Write-Host "Network reset complete." -ForegroundColor Green
+    Write-Host $L.NetDone -ForegroundColor Green
     Pause-Script
 }
 
 function Reset-WindowsUpdate {
     Show-Header
-    Write-Host "Resetting Windows Update Components..." -ForegroundColor Yellow
+    Write-Host $L.UpdateReset -ForegroundColor Yellow
     
     $services = "wuauserv", "cryptSvc", "bits", "msiserver"
     
     foreach ($service in $services) {
-        Write-Host "Stopping $service..."
+        Write-Host "$($L.Stopping) $service..."
         Stop-Service -Name $service -Force -ErrorAction SilentlyContinue
     }
     
-    Write-Host "Renaming SoftwareDistribution and Catroot2 folders..."
+    Write-Host $L.Renaming
     if (Test-Path "$env:windir\SoftwareDistribution") {
         Rename-Item "$env:windir\SoftwareDistribution" "$env:windir\SoftwareDistribution.old" -ErrorAction SilentlyContinue
     }
@@ -230,68 +382,59 @@ function Reset-WindowsUpdate {
     }
     
     foreach ($service in $services) {
-        Write-Host "Starting $service..."
+        Write-Host "$($L.Starting) $service..."
         Start-Service -Name $service -ErrorAction SilentlyContinue
     }
     
-    Write-Host "Windows Update reset complete." -ForegroundColor Green
+    Write-Host $L.UpdateDone -ForegroundColor Green
     Pause-Script
 }
 
 function Set-HighPerformance {
     Show-Header
-    Write-Host "Setting Power Plan to High Performance..." -ForegroundColor Yellow
-    # 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c is the GUID for High Performance
+    Write-Host $L.PowerHigh -ForegroundColor Yellow
     powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "High Performance plan activated." -ForegroundColor Green
+        Write-Host $L.PowerDone -ForegroundColor Green
     } else {
-        # Fallback to schemes check if GUID is missing/custom
-        Write-Host "Could not set by ID. Listing schemes:"
-        powercfg -list
-        Write-Host "Please manually select a scheme using 'powercfg -setactive <GUID>'"
+        Write-Host $L.PowerFail
     }
     Pause-Script
 }
 
 function Clear-EventLogs {
     Show-Header
-    Write-Host "Clearing Windows Event Logs..." -ForegroundColor Yellow
+    Write-Host $L.EventLogStart -ForegroundColor Yellow
     $logs = Get-EventLog -List
     foreach ($log in $logs) {
         try {
-            Write-Host "Clearing $($log.Log)..." -NoNewline
+            Write-Host "$($L.Cleaning) $($log.Log)..." -NoNewline
             Clear-EventLog -LogName $log.Log -ErrorAction Stop
-            Write-Host " Done." -ForegroundColor Green
-        } catch {
-            Write-Host " Failed (Access/InUse)." -ForegroundColor Red
-        }
+            Write-Host " " + $L.EventLogDone -ForegroundColor Green
+        } catch { }
     }
     Pause-Script
 }
 
 function Run-CommonMaintenance {
     Show-Header
-    Write-Host "Starting Common Maintenance Routine..." -ForegroundColor Magenta
+    Write-Host $L.RoutineStart -ForegroundColor Magenta
     Start-Sleep -Seconds 2
     
-    Enable-SystemRestore
-    
-    # Non-interactive restoration point
+    # Silent/Auto operations where possible
+    Enable-ComputerRestore -Drive "C:\" -ErrorAction SilentlyContinue
     Checkpoint-Computer -Description "AutoMaintenance" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue
     
-    # Run safe cleanup
     $paths = @("$env:TEMP\*", "$env:windir\Temp\*")
     foreach ($path in $paths) { Remove-Item -Path $path -Recurse -Force -ErrorAction SilentlyContinue }
     
-    # SFC
-    Write-Host "Running SFC (Quick mode check not possible, running full)..."
+    Write-Host "SFC..."
     sfc /scannow
     
-    # DISM
+    Write-Host "DISM..."
     DISM.exe /Online /Cleanup-image /Restorehealth
     
-    Write-Host "Routine complete." -ForegroundColor Green
+    Write-Host $L.RoutineDone -ForegroundColor Green
     Pause-Script
 }
 
@@ -301,24 +444,24 @@ function Run-CommonMaintenance {
 
 do {
     Show-Header
-    Write-Host "1.  Create Restore Point"
-    Write-Host "2.  Run System File Checker (SFC)"
-    Write-Host "3.  Run DISM Image Repair"
-    Write-Host "4.  Clear Temporary Files"
-    Write-Host "5.  Disk Cleanup"
-    Write-Host "6.  Check Disk (Schedule for Restart)"
-    Write-Host "7.  Reset Windows Store"
-    Write-Host "8.  Optimize/Defrag Drives"
-    Write-Host "9.  Network Reset (Flush DNS/IP)"
-    Write-Host "10. Reset Windows Update Components"
-    Write-Host "11. Set High Performance Power Plan"
-    Write-Host "12. Clear Event Logs"
+    Write-Host $L.Menu_1
+    Write-Host $L.Menu_2
+    Write-Host $L.Menu_3
+    Write-Host $L.Menu_4
+    Write-Host $L.Menu_5
+    Write-Host $L.Menu_6
+    Write-Host $L.Menu_7
+    Write-Host $L.Menu_8
+    Write-Host $L.Menu_9
+    Write-Host $L.Menu_10
+    Write-Host $L.Menu_11
+    Write-Host $L.Menu_12
     Write-Host "----------------------------------" -ForegroundColor Gray
-    Write-Host "A.  Run All Common Tasks (SFC, DISM, Temp)" -ForegroundColor Cyan
-    Write-Host "Q.  Quit"
+    Write-Host $L.Menu_A -ForegroundColor Cyan
+    Write-Host $L.Menu_Q
     Write-Host "============================================================" -ForegroundColor Cyan
     
-    $selection = Read-Host "Select an option"
+    $selection = Read-Host $L.SelectOption
     
     switch ($selection) {
         '1' { Create-RestorePoint }
@@ -335,6 +478,6 @@ do {
         '12' { Clear-EventLogs }
         {$_ -eq 'a' -or $_ -eq 'A'} { Run-CommonMaintenance }
         {$_ -eq 'q' -or $_ -eq 'Q'} { return }
-        Default { Write-Warning "Invalid selection. Please try again."; Start-Sleep -Seconds 1 }
+        Default { Write-Warning $L.InvalidSel; Start-Sleep -Seconds 1 }
     }
 } until ($selection -eq 'q' -or $selection -eq 'Q')
