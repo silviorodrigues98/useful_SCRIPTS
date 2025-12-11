@@ -114,33 +114,33 @@ $Dict = @{
     }
     
     PT = @{
-        HeaderTitle      = "      FERRAMENTA UNIVERSAL DE MANUTENÇÃO WINDOWS            "
+        HeaderTitle      = "      FERRAMENTA UNIVERSAL DE MANUTENCAO WINDOWS            "
         PauseMsg         = "Pressione qualquer tecla para voltar ao menu..."
         
-        EnableRestore    = "Habilitando Restauração do Sistema no drive C:..."
-        ResPointSuccess  = "Sucesso: Ponto de restauração criado."
-        ResPointFail     = "Erro: Não foi possível criar o ponto de restauração."
+        EnableRestore    = "Habilitando Restauracao do Sistema no drive C:..."
+        ResPointSuccess  = "Sucesso: Ponto de restauracao criado."
+        ResPointFail     = "Erro: Nao foi possivel criar o ponto de restauracao."
         
         SFCStart         = "Executando Verificador de Arquivos do Sistema (SFC)..."
         SFCNote          = "Isso pode levar algum tempo."
         
         DISMStart        = "Executando DISM (Reparo de Imagem)..."
-        DISMNote         = "Isso verifica a corrupção do armazenamento de componentes e tenta repará-lo."
+        DISMNote         = "Isso verifica a corrupcao do armazenamento de componentes e tenta repara-lo."
         
         DiskCleanStart   = "Executando Limpeza de Disco..."
-        DiskCleanMsg     = "Abrindo diálogo padrão de Limpeza de Disco..."
-        DiskCleanDone    = "Limpeza de Disco concluída."
+        DiskCleanMsg     = "Abrindo dialogo padrao de Limpeza de Disco..."
+        DiskCleanDone    = "Limpeza de Disco concluida."
         
-        ChkdskAsk        = "Agendar CHKDSK para a próxima reinicialização? (S/N)"
+        ChkdskAsk        = "Agendar CHKDSK para a proxima reinicializacao? (S/N)"
         ChkdskScheduled  = "CHKDSK agendado."
-        ChkdskCancelled  = "Operação cancelada."
+        ChkdskCancelled  = "Operacao cancelada."
         
-        ClearTempStart   = "Limpando Arquivos Temporários..."
-        ClearTempDone    = "Limpeza de arquivos temporários concluída."
+        ClearTempStart   = "Limpando Arquivos Temporarios..."
+        ClearTempDone    = "Limpeza de arquivos temporarios concluida."
         Cleaning         = "Limpando:"
         
         StoreReset       = "Redefinindo Cache da Microsoft Store (WSReset)..."
-        StoreDone        = "Redefinição da Store concluída."
+        StoreDone        = "Redefinicao da Store concluida."
         
         OptStart         = "Otimizando Unidades..."
         OptDrive         = "Otimizando Drive"
@@ -149,35 +149,35 @@ $Dict = @{
         NetFlush         = "Limpando cache DNS..."
         NetRelease       = "Liberando IP..."
         NetRenew         = "Renovando IP..."
-        NetWinsock       = "Redefinindo catálogo Winsock..."
+        NetWinsock       = "Redefinindo catalogo Winsock..."
         NetIP            = "Redefinindo pilha TCP IP..."
-        NetDone          = "Redefinição de rede concluída."
+        NetDone          = "Redefinicao de rede concluida."
         
         UpdateReset      = "Redefinindo Componentes do Windows Update..."
         Stopping         = "Parando"
         Starting         = "Iniciando"
         Renaming         = "Renomeando pastas SoftwareDistribution e Catroot2..."
-        UpdateDone       = "Redefinição do Windows Update concluída."
+        UpdateDone       = "Redefinicao do Windows Update concluida."
         
         PowerHigh        = "Definindo Plano de Energia para Alto Desempenho..."
         PowerDone        = "Plano de Alto Desempenho ativado."
-        PowerFail        = "Não foi possível definir pelo ID."
+        PowerFail        = "Nao foi possivel definir pelo ID."
         
         EventLogStart    = "Limpando Logs de Eventos do Windows..."
         EventLogDone     = "Feito."
         
-        RoutineStart     = "Iniciando Rotina de Manutenção Comum..."
+        RoutineStart     = "Iniciando Rotina de Manutencao Comum..."
         RoutineDone      = "Rotina completa."
         
-        SelectOption     = "Selecione uma opção"
-        InvalidSel       = "Seleção inválida. Tente novamente."
+        SelectOption     = "Selecione uma opcao"
+        InvalidSel       = "Selecao invalida. Tente novamente."
         
-        Menu_1           = "1.  Criar Ponto de Restauração"
+        Menu_1           = "1.  Criar Ponto de Restauracao"
         Menu_2           = "2.  Executar SFC (Verificador de Arquivos)"
         Menu_3           = "3.  Executar DISM (Reparo de Imagem)"
-        Menu_4           = "4.  Limpar Arquivos Temporários"
+        Menu_4           = "4.  Limpar Arquivos Temporarios"
         Menu_5           = "5.  Limpeza de Disco"
-        Menu_6           = "6.  Verificar Disco (Agendar no Reinício)"
+        Menu_6           = "6.  Verificar Disco (Agendar no Reinicio)"
         Menu_7           = "7.  Redefinir Windows Store"
         Menu_8           = "8.  Otimizar/Desfragmentar Drives"
         Menu_9           = "9.  Redefinir Rede (Flush DNS/IP)"
