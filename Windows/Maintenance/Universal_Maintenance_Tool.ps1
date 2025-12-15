@@ -563,9 +563,13 @@ function Manage-StartupApps {
             $i = 1
             $table = @()
             foreach ($app in $apps) {
+                # ASCII Checkbox logic
+                $state = "[ ]"
+                if ($app.Status -eq $L.StartupEnabled) { $state = "[x]" }
+                
                 $table += [PSCustomObject]@{
                     ID = $i
-                    Status = $app.Status
+                    State = $state
                     Name = $app.Name
                     Type = $app.Type
                     Command = $app.Command
@@ -573,68 +577,77 @@ function Manage-StartupApps {
                 $i++
             }
             $table | Format-Table -AutoSize
+            Write-Host " [x] = $($L.StartupEnabled) | [ ] = $($L.StartupDisabled)" -ForegroundColor Gray
         }
         
         Write-Host ""
-        $choice = Read-Host $L.StartupRemove
+        # Update Prompt to indicate toggle capability
+        Write-Host "Enter ID(s) to Toggle (e.g. 1,3,5) or 'r' plus ID to Remove (e.g. r1): " -NoNewline
+        $choice = Read-Host
         
-        if ($choice -match '^\d+$' -and [int]$choice -le $apps.Count -and [int]$choice -gt 0) {
-            $selected = $apps[[int]$choice - 1]
-            Write-Host "Selected: $($selected.Name) ($($selected.Status))" -ForegroundColor Cyan
-            Write-Host $L.StartupAction
-            $action = Read-Host $L.SelectOption
-            
-            try {
-                if ($action -eq '1') {
-                    # Toggle Status
-                    if ($selected.Type -like "Registry*") {
-                        if ($selected.Status -eq $L.StartupEnabled) {
-                            # Disable: Move to Run_Disabled
-                            $targetPath = $selected.Location.Replace("CurrentVersion\Run", "CurrentVersion\Run_Disabled")
-                            if (!(Test-Path $targetPath)) { New-Item -Path $targetPath -Force | Out-Null }
-                            Set-ItemProperty -Path $targetPath -Name $selected.Name -Value $selected.Command
-                            Remove-ItemProperty -Path $selected.Location -Name $selected.Name
-                        } else {
-                            # Enable: Move back to Run
-                            $targetPath = $selected.Location.Replace("CurrentVersion\Run_Disabled", "CurrentVersion\Run")
-                            Set-ItemProperty -Path $targetPath -Name $selected.Name -Value $selected.Command
-                            Remove-ItemProperty -Path $selected.Location -Name $selected.Name
-                        }
-                    } else {
-                        # Folder Items
-                        if ($selected.Status -eq $L.StartupEnabled) {
-                            # Disable: Rename to .disabled
-                            Rename-Item -Path $selected.Command -NewName "$($selected.Name).disabled"
-                        } else {
-                            # Enable: Remove .disabled extension
-                            $newName = $selected.Name  # Name in object is already stripped of .disabled? No, command has full path.
-                            # Get-StartupApps strips .disabled from Name property for display, but Command is full path.
-                            # Re-construct original name logic
-                            Rename-Item -Path $selected.Command -NewName ($selected.Command -replace '\.disabled$', '')
-                        }
-                    }
-                    Write-Host $L.StartupToggled -ForegroundColor Green
-                }
-                elseif ($action -eq '2') {
-                    # Remove Permanently
+        if ($choice -match '^[qQ]$') { return }
+        
+        # Parse Input
+        $ids = $choice -split ',' | ForEach-Object { $_.Trim() }
+        
+        foreach ($idStr in $ids) {
+            if ($idStr -match '^r(\d+)$') {
+                # Remove Logic
+                $id = $matches[1]
+                if ([int]$id -le $apps.Count -and [int]$id -gt 0) {
+                    $selected = $apps[[int]$id - 1]
                     Write-Host "Removing $($selected.Name)..." -ForegroundColor Yellow
-                    if ($selected.Type -like "Registry*") {
-                        Remove-ItemProperty -Path $selected.Location -Name $selected.Name -ErrorAction Stop
-                    } else {
-                        Remove-Item -Path $selected.Command -Force -ErrorAction Stop
+                    try {
+                        if ($selected.Type -like "Registry*") {
+                            Remove-ItemProperty -Path $selected.Location -Name $selected.Name -ErrorAction Stop
+                        } else {
+                            Remove-Item -Path $selected.Command -Force -ErrorAction Stop
+                        }
+                        Write-Host "$($selected.Name): $($L.StartupRemoved)" -ForegroundColor Green
+                    } catch {
+                        Write-Host "Error removing $($selected.Name): $($_.Exception.Message)" -ForegroundColor Red
                     }
-                    Write-Host $L.StartupRemoved -ForegroundColor Green
                 }
-                Start-Sleep -Seconds 2
-            } catch {
-                Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
-                Pause-Script
             }
-        } elseif ($choice -notin 'q','Q') {
-            # Invalid input
+            elseif ($idStr -match '^\d+$') {
+                # Toggle Logic
+                $id = $idStr
+                if ([int]$id -le $apps.Count -and [int]$id -gt 0) {
+                    $selected = $apps[[int]$id - 1]
+                    try {
+                         if ($selected.Type -like "Registry*") {
+                            if ($selected.Status -eq $L.StartupEnabled) {
+                                # Disable
+                                $targetPath = $selected.Location.Replace("CurrentVersion\Run", "CurrentVersion\Run_Disabled")
+                                if (!(Test-Path $targetPath)) { New-Item -Path $targetPath -Force | Out-Null }
+                                Set-ItemProperty -Path $targetPath -Name $selected.Name -Value $selected.Command
+                                Remove-ItemProperty -Path $selected.Location -Name $selected.Name
+                            } else {
+                                # Enable
+                                $targetPath = $selected.Location.Replace("CurrentVersion\Run_Disabled", "CurrentVersion\Run")
+                                Set-ItemProperty -Path $targetPath -Name $selected.Name -Value $selected.Command
+                                Remove-ItemProperty -Path $selected.Location -Name $selected.Name
+                            }
+                        } else {
+                            # Folder Items
+                            if ($selected.Status -eq $L.StartupEnabled) {
+                                # Disable
+                                Rename-Item -Path $selected.Command -NewName "$($selected.Name).disabled"
+                            } else {
+                                # Enable
+                                Rename-Item -Path $selected.Command -NewName ($selected.Command -replace '\.disabled$', '')
+                            }
+                        }
+                        Write-Host "$($selected.Name): $($L.StartupToggled)" -ForegroundColor Green
+                    } catch {
+                         Write-Host "Error toggling $($selected.Name): $($_.Exception.Message)" -ForegroundColor Red
+                    }
+                }
+            }
         }
+        Start-Sleep -Seconds 1
         
-    } until ($choice -eq 'q' -or $choice -eq 'Q')
+    } until ($false) # Infinite loop until 'q' returns
 }
 
 function Manage-Services {
