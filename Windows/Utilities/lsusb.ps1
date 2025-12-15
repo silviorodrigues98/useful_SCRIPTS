@@ -6,10 +6,26 @@
     This script retrieves information about connected USB devices using Get-PnpDevice.
     It parses the Vendor ID (VID) and Product ID (PID) from the device instance ID
     and formats the output to resemble the standard lsusb output.
+    
+    Use the -Detailed (or -v) switch to see comprehensive properties for each device.
+
+.PARAMETER Detailed
+    Display detailed information about each device, including Manufacturer, Status, Class, etc.
+    Alias: -v
 
 .EXAMPLE
     .\lsusb.ps1
+    Lists devices in short format.
+    
+.EXAMPLE
+    .\lsusb.ps1 -v
+    Lists devices with detailed information.
 #>
+[CmdletBinding()]
+Param(
+    [Alias('v')]
+    [switch]$Detailed
+)
 
 $ErrorActionPreference = "SilentlyContinue"
 
@@ -23,12 +39,24 @@ foreach ($device in $usbDevices) {
         $vendorId = $matches[1]
         $productId = $matches[2]
         
-        # Format similar to lsusb: "Bus 000 Device 000: ID VID:PID FriendlyName"
-        # Since Windows doesn't use Bus/Device numbers like Linux, we'll use a placeholder or check if we can get LocationInfo (often not generic).
-        # We will use "Bus 000 Device 000" as a static label or just omit it to avoid confusion, 
-        # but the request asked to be "similar to lsusb". 
-        # Let's use the standard output format with simply valid IDs.
-        
         Write-Output "Bus 000 Device 000: ID ${vendorId}:${productId} $($device.FriendlyName)"
+        
+        if ($Detailed) {
+            Write-Output "  Device Descriptor:"
+            Write-Output "    InstanceId:   $($device.InstanceId)"
+            Write-Output "    Manufacturer: $($device.Manufacturer)"
+            Write-Output "    Status:       $($device.Status)"
+            Write-Output "    Class:        $($device.Class)"
+            Write-Output "    Service:      $($device.Service)"
+            Write-Output "    HardwareIDs:"
+            foreach ($hwId in $device.HardwareID) {
+                Write-Output "      $hwId"
+            }
+            Write-Output "    CompatibleIDs:"
+            foreach ($cId in $device.CompatibleID) {
+                Write-Output "      $cId"
+            }
+            Write-Output ""
+        }
     }
 }
