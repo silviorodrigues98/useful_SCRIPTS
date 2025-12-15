@@ -117,9 +117,13 @@ $Dict = @{
         Menu_13          = "13. Manage Startup Apps"
         Menu_14          = "14. Manage Services"
         StartupList      = "Listing Startup Applications..."
-        StartupRemove    = "Enter ID to remove (or 'q' to go back): "
-        StartupRemoved   = "Startup item removed."
+        StartupRemove    = "Enter ID to Toggle/Remove (or 'q' to go back): "
+        StartupRemoved   = "Startup item Removed."
+        StartupToggled   = "Startup item Toggled."
         StartupNotFound  = "Item not found."
+        StartupEnabled   = "Enabled"
+        StartupDisabled  = "Disabled"
+        StartupAction    = "Select Action: 1. Toggle Status (Enable/Disable) 2. Remove Permanently"
         ServiceList      = "Listing Services..."
         ServiceSearch    = "Search filter (leave empty for all): "
         ServiceAction    = "Enter Service Name to manage (or 'q' to go back): "
@@ -210,9 +214,13 @@ $Dict = @{
         Menu_13          = "13. Gerenciar Apps de Inicializacao"
         Menu_14          = "14. Gerenciar Servicos"
         StartupList      = "Listando Aplicativos de Inicializacao..."
-        StartupRemove    = "Digite o ID para remover (ou 'q' para voltar): "
+        StartupRemove    = "Digite o ID para Alterar/Remover (ou 'q' para voltar): "
         StartupRemoved   = "Item de inicializacao removido."
+        StartupToggled   = "Status do item alterado."
         StartupNotFound  = "Item nao encontrado."
+        StartupEnabled   = "Habilitado"
+        StartupDisabled  = "Desabilitado"
+        StartupAction    = "Selecione Acao: 1. Alternar Status (Ativar/Desativar) 2. Remover Permanentemente"
         ServiceList      = "Listando Servicos..."
         ServiceSearch    = "Filtro de busca (vazio para todos): "
         ServiceAction    = "Nome do Servico para gerenciar (ou 'q' para voltar): "
@@ -481,10 +489,12 @@ function Run-CommonMaintenance {
 function Get-StartupApps {
     $apps = @()
     
-    # Registry Keys
+    # Registry Keys (Run and Run_Disabled)
     $regKeys = @(
-        @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"; Root = "HKCU" },
-        @{ Path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"; Root = "HKLM" }
+        @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"; Root = "HKCU"; Status = $L.StartupEnabled },
+        @{ Path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"; Root = "HKLM"; Status = $L.StartupEnabled },
+        @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run_Disabled"; Root = "HKCU"; Status = $L.StartupDisabled },
+        @{ Path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run_Disabled"; Root = "HKLM"; Status = $L.StartupDisabled }
     )
 
     foreach ($key in $regKeys) {
@@ -497,6 +507,7 @@ function Get-StartupApps {
                     Command = $items.$name
                     Location = $key.Path
                     Type = "Registry ($($key.Root))"
+                    Status = $key.Status
                 }
             }
         }
@@ -510,13 +521,26 @@ function Get-StartupApps {
 
     foreach ($folder in $folders) {
         if (Test-Path $folder.Path) {
-            $files = Get-ChildItem -Path $folder.Path -File
+            # Standard Files
+            $files = Get-ChildItem -Path $folder.Path -File | Where-Object { $_.Extension -ne ".disabled" }
             foreach ($file in $files) {
                 $apps += [PSCustomObject]@{
                     Name = $file.Name
                     Command = $file.FullName
                     Location = $folder.Path
                     Type = $folder.Type
+                    Status = $L.StartupEnabled
+                }
+            }
+            # Disabled Files (We assume .disabled extension)
+            $disabledFiles = Get-ChildItem -Path $folder.Path -File | Where-Object { $_.Extension -eq ".disabled" }
+            foreach ($file in $disabledFiles) {
+                $apps += [PSCustomObject]@{
+                    Name = $file.Name.Replace(".disabled", "") # Display name without .disabled
+                    Command = $file.FullName
+                    Location = $folder.Path
+                    Type = $folder.Type
+                    Status = $L.StartupDisabled
                 }
             }
         }
@@ -541,6 +565,7 @@ function Manage-StartupApps {
             foreach ($app in $apps) {
                 $table += [PSCustomObject]@{
                     ID = $i
+                    Status = $app.Status
                     Name = $app.Name
                     Type = $app.Type
                     Command = $app.Command
@@ -555,15 +580,51 @@ function Manage-StartupApps {
         
         if ($choice -match '^\d+$' -and [int]$choice -le $apps.Count -and [int]$choice -gt 0) {
             $selected = $apps[[int]$choice - 1]
-            Write-Host "Removing $($selected.Name)..." -ForegroundColor Yellow
+            Write-Host "Selected: $($selected.Name) ($($selected.Status))" -ForegroundColor Cyan
+            Write-Host $L.StartupAction
+            $action = Read-Host $L.SelectOption
             
             try {
-                if ($selected.Type -like "Registry*") {
-                    Remove-ItemProperty -Path $selected.Location -Name $selected.Name -ErrorAction Stop
-                } else {
-                    Remove-Item -Path $selected.Command -Force -ErrorAction Stop
+                if ($action -eq '1') {
+                    # Toggle Status
+                    if ($selected.Type -like "Registry*") {
+                        if ($selected.Status -eq $L.StartupEnabled) {
+                            # Disable: Move to Run_Disabled
+                            $targetPath = $selected.Location.Replace("CurrentVersion\Run", "CurrentVersion\Run_Disabled")
+                            if (!(Test-Path $targetPath)) { New-Item -Path $targetPath -Force | Out-Null }
+                            Set-ItemProperty -Path $targetPath -Name $selected.Name -Value $selected.Command
+                            Remove-ItemProperty -Path $selected.Location -Name $selected.Name
+                        } else {
+                            # Enable: Move back to Run
+                            $targetPath = $selected.Location.Replace("CurrentVersion\Run_Disabled", "CurrentVersion\Run")
+                            Set-ItemProperty -Path $targetPath -Name $selected.Name -Value $selected.Command
+                            Remove-ItemProperty -Path $selected.Location -Name $selected.Name
+                        }
+                    } else {
+                        # Folder Items
+                        if ($selected.Status -eq $L.StartupEnabled) {
+                            # Disable: Rename to .disabled
+                            Rename-Item -Path $selected.Command -NewName "$($selected.Name).disabled"
+                        } else {
+                            # Enable: Remove .disabled extension
+                            $newName = $selected.Name  # Name in object is already stripped of .disabled? No, command has full path.
+                            # Get-StartupApps strips .disabled from Name property for display, but Command is full path.
+                            # Re-construct original name logic
+                            Rename-Item -Path $selected.Command -NewName ($selected.Command -replace '\.disabled$', '')
+                        }
+                    }
+                    Write-Host $L.StartupToggled -ForegroundColor Green
                 }
-                Write-Host $L.StartupRemoved -ForegroundColor Green
+                elseif ($action -eq '2') {
+                    # Remove Permanently
+                    Write-Host "Removing $($selected.Name)..." -ForegroundColor Yellow
+                    if ($selected.Type -like "Registry*") {
+                        Remove-ItemProperty -Path $selected.Location -Name $selected.Name -ErrorAction Stop
+                    } else {
+                        Remove-Item -Path $selected.Command -Force -ErrorAction Stop
+                    }
+                    Write-Host $L.StartupRemoved -ForegroundColor Green
+                }
                 Start-Sleep -Seconds 2
             } catch {
                 Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
