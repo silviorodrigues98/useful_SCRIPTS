@@ -9,6 +9,9 @@ echo.
 set "SCRIPT_DIR=%~dp0"
 
 :: Launch the PowerShell script
+:: -ExecutionPolicy Bypass: Allows this script to run without changing global system settings.
+:: Unblock-File: Ensures the script isn't blocked by Windows "Mark of the Web" security.
+powershell.exe -NoProfile -Command "Unblock-File -Path '%SCRIPT_DIR%Universal_Maintenance_Tool.ps1' -ErrorAction SilentlyContinue"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%Universal_Maintenance_Tool.ps1"
 
 :: If the script creates a new window (due to elevation), this window might close immediately.

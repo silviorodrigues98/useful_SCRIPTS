@@ -111,6 +111,24 @@ $Dict = @{
         Menu_12          = "12. Clear Event Logs"
         Menu_A           = "A.  Run All Common Tasks (SFC, DISM, Temp)"
         Menu_Q           = "Q.  Quit"
+        
+        StartupTitle     = "Startup Applications Manager"
+        ServicesTitle    = "Services Manager"
+        Menu_13          = "13. Manage Startup Apps"
+        Menu_14          = "14. Manage Services"
+        StartupList      = "Listing Startup Applications..."
+        StartupRemove    = "Enter ID to remove (or 'q' to go back): "
+        StartupRemoved   = "Startup item removed."
+        StartupNotFound  = "Item not found."
+        ServiceList      = "Listing Services..."
+        ServiceSearch    = "Search filter (leave empty for all): "
+        ServiceAction    = "Enter Service Name to manage (or 'q' to go back): "
+        ServiceOpt       = "1. Start 2. Stop 3. Restart 4. Set Startup Type"
+        ServiceStart     = "Starting service..."
+        ServiceStop      = "Stopping service..."
+        ServiceRestart   = "Restarting service..."
+        ServiceType      = "Select Startup Type: 1. Automatic 2. Manual 3. Disabled"
+        ServiceSuccess   = "Operation successful."
     }
     
     PT = @{
@@ -186,6 +204,24 @@ $Dict = @{
         Menu_12          = "12. Limpar Logs de Eventos"
         Menu_A           = "A.  Executar Tarefas Comuns (SFC, DISM, Temp)"
         Menu_Q           = "Q.  Sair"
+
+        StartupTitle     = "Gerenciador de Aplicativos de Inicializacao"
+        ServicesTitle    = "Gerenciador de Servicos"
+        Menu_13          = "13. Gerenciar Apps de Inicializacao"
+        Menu_14          = "14. Gerenciar Servicos"
+        StartupList      = "Listando Aplicativos de Inicializacao..."
+        StartupRemove    = "Digite o ID para remover (ou 'q' para voltar): "
+        StartupRemoved   = "Item de inicializacao removido."
+        StartupNotFound  = "Item nao encontrado."
+        ServiceList      = "Listando Servicos..."
+        ServiceSearch    = "Filtro de busca (vazio para todos): "
+        ServiceAction    = "Nome do Servico para gerenciar (ou 'q' para voltar): "
+        ServiceOpt       = "1. Iniciar 2. Parar 3. Reiniciar 4. Tipo de Inicializacao"
+        ServiceStart     = "Iniciando servico..."
+        ServiceStop      = "Parando servico..."
+        ServiceRestart   = "Reiniciando servico..."
+        ServiceType      = "Selecione Tipo: 1. Automatico 2. Manual 3. Desativado"
+        ServiceSuccess   = "Operacao realizada com sucesso."
     }
 }
 
@@ -439,6 +475,179 @@ function Run-CommonMaintenance {
 }
 
 # ---------------------------------------------------------------------------
+# Extended Functions - Startup Manager
+# ---------------------------------------------------------------------------
+
+function Get-StartupApps {
+    $apps = @()
+    
+    # Registry Keys
+    $regKeys = @(
+        @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"; Root = "HKCU" },
+        @{ Path = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"; Root = "HKLM" }
+    )
+
+    foreach ($key in $regKeys) {
+        if (Test-Path $key.Path) {
+            $items = Get-ItemProperty -Path $key.Path
+            foreach ($name in $items.PSObject.Properties.Name) {
+                if ($name -match '^(PSPath|PSParentPath|PSChildName|PSDrive|PSProvider)$') { continue }
+                $apps += [PSCustomObject]@{
+                    Name = $name
+                    Command = $items.$name
+                    Location = $key.Path
+                    Type = "Registry ($($key.Root))"
+                }
+            }
+        }
+    }
+
+    # Startup Folders
+    $folders = @(
+        @{ Path = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"; Type = "User Startup Folder" },
+        @{ Path = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"; Type = "System Startup Folder" }
+    )
+
+    foreach ($folder in $folders) {
+        if (Test-Path $folder.Path) {
+            $files = Get-ChildItem -Path $folder.Path -File
+            foreach ($file in $files) {
+                $apps += [PSCustomObject]@{
+                    Name = $file.Name
+                    Command = $file.FullName
+                    Location = $folder.Path
+                    Type = $folder.Type
+                }
+            }
+        }
+    }
+    
+    return $apps
+}
+
+function Manage-StartupApps {
+    do {
+        Show-Header
+        Write-Host $L.StartupTitle -ForegroundColor Cyan
+        Write-Host "----------------------------------" -ForegroundColor Gray
+        
+        $apps = Get-StartupApps
+        
+        if ($apps.Count -eq 0) {
+            Write-Host "No startup apps found." -ForegroundColor Yellow
+        } else {
+            $i = 1
+            $table = @()
+            foreach ($app in $apps) {
+                $table += [PSCustomObject]@{
+                    ID = $i
+                    Name = $app.Name
+                    Type = $app.Type
+                    Command = $app.Command
+                }
+                $i++
+            }
+            $table | Format-Table -AutoSize
+        }
+        
+        Write-Host ""
+        $choice = Read-Host $L.StartupRemove
+        
+        if ($choice -match '^\d+$' -and [int]$choice -le $apps.Count -and [int]$choice -gt 0) {
+            $selected = $apps[[int]$choice - 1]
+            Write-Host "Removing $($selected.Name)..." -ForegroundColor Yellow
+            
+            try {
+                if ($selected.Type -like "Registry*") {
+                    Remove-ItemProperty -Path $selected.Location -Name $selected.Name -ErrorAction Stop
+                } else {
+                    Remove-Item -Path $selected.Command -Force -ErrorAction Stop
+                }
+                Write-Host $L.StartupRemoved -ForegroundColor Green
+                Start-Sleep -Seconds 2
+            } catch {
+                Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+                Pause-Script
+            }
+        } elseif ($choice -notin 'q','Q') {
+            # Invalid input
+        }
+        
+    } until ($choice -eq 'q' -or $choice -eq 'Q')
+}
+
+function Manage-Services {
+    do {
+        Show-Header
+        Write-Host $L.ServicesTitle -ForegroundColor Cyan
+        Write-Host "----------------------------------" -ForegroundColor Gray
+        
+        $filter = Read-Host $L.ServiceSearch
+        if ([string]::IsNullOrWhiteSpace($filter)) {
+            Write-Host $L.ServiceList -ForegroundColor Gray
+            $services = Get-Service | Select-Object -First 50
+        } else {
+            $services = Get-Service | Where-Object { $_.Name -like "*$filter*" -or $_.DisplayName -like "*$filter*" }
+        }
+        
+        if ($services.Count -eq 0) {
+            Write-Host "No services found." -ForegroundColor Yellow
+        } else {
+            $services | Select-Object Status, Name, DisplayName, StartType | Format-Table -AutoSize
+        }
+        
+        Write-Host ""
+        $svcName = Read-Host $L.ServiceAction
+        
+        if ($svcName -notin 'q','Q') {
+            $svc = Get-Service -Name $svcName -ErrorAction SilentlyContinue
+            if ($svc) {
+                 Write-Host "Selected: $($svc.Name) ($($svc.Status))" -ForegroundColor Cyan
+                 Write-Host $L.ServiceOpt
+                 $action = Read-Host $L.SelectOption
+                 
+                 try {
+                     switch ($action) {
+                        '1' { 
+                            Write-Host $L.ServiceStart
+                            Start-Service -Name $svc.Name -ErrorAction Stop
+                            Write-Host $L.ServiceSuccess -ForegroundColor Green
+                        }
+                        '2' { 
+                            Write-Host $L.ServiceStop
+                            Stop-Service -Name $svc.Name -ErrorAction Stop
+                            Write-Host $L.ServiceSuccess -ForegroundColor Green
+                        }
+                        '3' { 
+                            Write-Host $L.ServiceRestart
+                            Restart-Service -Name $svc.Name -ErrorAction Stop
+                            Write-Host $L.ServiceSuccess -ForegroundColor Green
+                        }
+                        '4' {
+                            Write-Host $L.ServiceType
+                            $typeChoice = Read-Host "? (1-3)"
+                            switch ($typeChoice) {
+                                '1' { Set-Service -Name $svc.Name -StartupType Automatic; Write-Host $L.ServiceSuccess -ForegroundColor Green }
+                                '2' { Set-Service -Name $svc.Name -StartupType Manual; Write-Host $L.ServiceSuccess -ForegroundColor Green }
+                                '3' { Set-Service -Name $svc.Name -StartupType Disabled; Write-Host $L.ServiceSuccess -ForegroundColor Green }
+                            }
+                        }
+                     }
+                     Start-Sleep -Seconds 2
+                 } catch {
+                     Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+                     Pause-Script
+                 }
+            } elseif ([string]::IsNullOrWhiteSpace($svcName) -eq $false) {
+                 Write-Host $L.StartupNotFound -ForegroundColor Red
+                 Start-Sleep -Seconds 1
+            }
+        }
+        
+    } until ($svcName -eq 'q' -or $svcName -eq 'Q')
+}
+
+# ---------------------------------------------------------------------------
 # Main Menu Loop
 # ---------------------------------------------------------------------------
 
@@ -456,6 +665,8 @@ do {
     Write-Host $L.Menu_10
     Write-Host $L.Menu_11
     Write-Host $L.Menu_12
+    Write-Host $L.Menu_13
+    Write-Host $L.Menu_14
     Write-Host "----------------------------------" -ForegroundColor Gray
     Write-Host $L.Menu_A -ForegroundColor Cyan
     Write-Host $L.Menu_Q
@@ -476,6 +687,8 @@ do {
         '10' { Reset-WindowsUpdate }
         '11' { Set-HighPerformance }
         '12' { Clear-EventLogs }
+        '13' { Manage-StartupApps }
+        '14' { Manage-Services }
         {$_ -eq 'a' -or $_ -eq 'A'} { Run-CommonMaintenance }
         {$_ -eq 'q' -or $_ -eq 'Q'} { return }
         Default { Write-Warning $L.InvalidSel; Start-Sleep -Seconds 1 }
